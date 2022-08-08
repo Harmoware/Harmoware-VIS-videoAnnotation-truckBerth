@@ -15,7 +15,7 @@ export const TruckBerthInput = (props)=>{
         reader.readAsText(file);
         const file_name = file.name;
         reader.onload = () => {
-            const linedata = reader.result.toString().split(/\r\n/);
+            const linedata = reader.result.toString().split(/(\r\n|\n)/);
             const readdata = linedata.map((lineArray)=>{
                 return lineArray.split(',')
             })
