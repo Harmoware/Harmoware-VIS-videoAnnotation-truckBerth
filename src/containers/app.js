@@ -72,7 +72,7 @@ class App extends Container {
     context.fillText(`door open rate`,30,rateStart_y+20)
     context.strokeStyle = '#CCCCCC'
     context.fillStyle = '#CCCCCC'
-    context.strokeRect(start_x,rateStart_y,graphwidth,100)
+    context.strokeRect(start_x,rateStart_y,graphwidth,101)
     let berthCount = 15
     if(this.state.berthDataArray !== null){
       berthCount = this.state.berthDataArray.length
@@ -133,7 +133,8 @@ class App extends Container {
         })
         const berthText = data.berthData.map((berthData,idx)=>{
           const condition = berthData===1 ? 'open' : berthData===2 ? 'close' :""
-          return {fillText:{text:`${condition}`,x:wk_x+2,y:clientHeight+155+(idx*30)},fillStyle:"lime"}
+          const condiShift = berthData===1 ? 0 : berthData===2 ? -5 : 0
+          return {fillText:{text:`${condition}`,x:wk_x+2,y:clientHeight+155+(idx*30)+condiShift},fillStyle:"lime"}
         })
         return {...data,
           path:{coordinate:[[wk_x,rateStart_y-30],[wk_x,rateStart_y+565]],strokeStyle:"lime"},
@@ -157,7 +158,7 @@ class App extends Container {
         const dataLength = currentdata.length
         context.beginPath()
         for(let j=0; j<dataLength; j=j+1){
-          const value = (currentdata[j]*12)-24
+          const value = (currentdata[j]*10)-20-2
           if(j===0){
             context.moveTo(start_x+(j*framePerPx),start_y-value)
           }else{
