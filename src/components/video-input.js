@@ -4,7 +4,7 @@ export const VideoInput = (props)=>{
     const inputRef = React.useRef(undefined)
     const [urlCheck,setUrlCheck] = React.useState(false)
     //const [value,setValue] = React.useState("https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4")
-    const [value,setValue] = React.useState("../../data/truck_berth.mp4")
+    const [value,setValue] = React.useState("data/truck_berth.mp4")
     const { updateState } = props;
 
     const onClick = ()=>{
