@@ -3,6 +3,70 @@ import React from 'react';
 export const TruckBerthInput = (props)=>{
     const { actions, id, videoFps, realFrameInterval } = props;
 
+    React.useEffect(()=>{
+        const request = new XMLHttpRequest();
+        request.open('GET', 'data/barthInfo_20220413-1100.csv');
+        request.responseType = 'text';
+        request.send();
+        actions.setLoading(true);
+        actions.setMovesBase([]);
+        request.onload = function() {
+            try {
+                const linedata = request.response.toString().split(/(\r\n|\n)/);
+                const readdata = linedata.map((lineArray)=>{
+                    return lineArray.split(',')
+                })
+                const titledata = readdata.shift()
+                const dataLength = titledata.length
+                const filterData = readdata.filter((data)=>data.length===dataLength)
+                const ngData = filterData.find((data,idx)=>parseInt(data[0])!==idx)
+                if(ngData!==undefined){
+                    window.alert('CSVデータのフレーム数が不正');
+                    console.log('CSVデータのフレーム数が不正')
+                    return
+                }
+                const lastData = [...filterData[filterData.length-1]]
+                lastData[0] = filterData.length
+                filterData.push(lastData)
+                let berthDataArray = new Array(dataLength-1);
+                const truckBerthData = filterData.map((data,idx)=>{
+                    const frame = parseInt(data[0])
+                    let berthData = []
+                    let berthUseCount = 0
+                    let doorOpneCount = 0
+                    for(let i=0; i<data.length; i=i+1){
+                        if(i>0){
+                            const setData = parseInt(data[i]) 
+                            berthData.push(setData)
+                            if(idx===0){
+                                berthDataArray[i-1] = []
+                            }
+                            berthDataArray[i-1].push(setData)
+                            berthUseCount = berthUseCount + (setData>0 ? 1 : 0)
+                            doorOpneCount = doorOpneCount + (setData===1 ? 1 : 0)
+                        }
+                    }
+                    berthData.reverse()
+                    return {
+                        frame:frame,
+                        elapsedtime:(frame/videoFps),
+                        realtime:(frame*realFrameInterval),
+                        berthData:berthData,
+                        berthUseRete:(berthUseCount/(data.length-1)),
+                        doorOpenRete:(doorOpneCount/(data.length-1))
+                    }
+                })
+                berthDataArray.reverse()
+                actions.setInputFilename({ truckBerthFileName: 'sample data' });
+                props.updateState({truckBerthData,berthDataArray})
+                actions.setAnimatePause(true);
+                actions.setLoading(false);
+            } catch (exception) {
+                actions.setLoading(false);
+            }
+        }
+    },[])
+
     const onSelect = (e)=>{
         const reader = new FileReader();
         const file = e.target.files[0];
